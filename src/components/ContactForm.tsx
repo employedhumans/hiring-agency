@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
 import {
   Button,
@@ -12,6 +12,7 @@ import {
   Box,
 } from '@material-ui/core';
 import { Formik } from 'formik';
+import PersonalForm from './forms/PersonalForm';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,7 +20,6 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       display: 'grid',
       gridTemplateColumns: '1fr 5fr',
-      textAlign: 'center',
     },
     button: {
       marginRight: theme.spacing(1),
@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     stepper: {
       padding: theme.spacing(1),
+      textAlign: 'center',
     },
     steps: {
       marginBottom: theme.spacing(1.5),
@@ -110,26 +111,35 @@ const ContactForm: FC = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={handleNext}
+        type="submit"
         className={classes.button}
       >
         {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
       </Button>
     </Box>
   );
-
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phones, setPhones] = useState(['']);
   const getStepContent = (step: number) => {
     switch (step) {
       case 0:
         return (
           <>
             <Formik
-              initialValues={{ name: '', email: '', phones: [''] }}
-              onSubmit={values => console.log(values)}
+              initialValues={{ name, email, phones }}
+              onSubmit={({ name, email, phones }) => {
+                setName(name);
+                setEmail(email);
+                setPhones(phones);
+                handleNext();
+              }}
             >
-              <form>
-                <ButtonBar />
-              </form>
+              {({ values }) => (
+                <PersonalForm values={values}>
+                  <ButtonBar />
+                </PersonalForm>
+              )}
             </Formik>
           </>
         );
