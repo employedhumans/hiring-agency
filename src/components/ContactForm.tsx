@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-
+import * as Yup from 'yup';
 import {
   Button,
   Stepper,
@@ -22,14 +22,15 @@ const useStyles = makeStyles((theme: Theme) =>
       gridTemplateColumns: '1fr 5fr',
     },
     button: {
-      marginRight: theme.spacing(1),
+      marginRight: theme.spacing(1.5),
+      marginTop: theme.spacing(1),
+      marginLeft: theme.spacing(1.5),
     },
     instructions: {
       marginTop: theme.spacing(1),
       marginBottom: theme.spacing(1),
     },
     stepper: {
-      padding: theme.spacing(1),
       textAlign: 'center',
     },
     steps: {
@@ -89,7 +90,7 @@ const ContactForm: FC = () => {
     'Create an ad',
   ];
 
-  const ButtonBar = () => (
+  const ButtonBar: FC<{ disabled?: boolean }> = ({ disabled }) => (
     <Box>
       <Button
         disabled={activeStep === 0}
@@ -113,6 +114,7 @@ const ContactForm: FC = () => {
         color="primary"
         type="submit"
         className={classes.button}
+        disabled={disabled}
       >
         {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
       </Button>
@@ -128,6 +130,8 @@ const ContactForm: FC = () => {
           <>
             <Formik
               initialValues={{ name, email, phones }}
+              validationSchema={personalFormSchema}
+              validateOnBlur
               onSubmit={({ name, email, phones }) => {
                 setName(name);
                 setEmail(email);
@@ -135,9 +139,9 @@ const ContactForm: FC = () => {
                 handleNext();
               }}
             >
-              {({ values }) => (
+              {({ values, isValid }) => (
                 <PersonalForm values={values}>
-                  <ButtonBar />
+                  <ButtonBar disabled={!isValid} />
                 </PersonalForm>
               )}
             </Formik>
@@ -193,3 +197,19 @@ const ContactForm: FC = () => {
 };
 
 export default ContactForm;
+
+/**
+ * Personal Form schema
+ */
+
+const personalFormSchema = Yup.object().shape({
+  name: Yup.string().required(),
+  email: Yup.string()
+    .email()
+    .required(),
+  phones: Yup.array().of(
+    Yup.string()
+      .matches(/^\d{10}$/, 'enter a valid phone number')
+      .required('phone number is required'),
+  ),
+});

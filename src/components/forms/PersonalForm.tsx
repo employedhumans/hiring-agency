@@ -39,8 +39,8 @@ const PersonalForm: FC<Prop> = ({ values, children }) => {
   const classes = useStyles();
   return (
     <Form>
-      <CustomField label="name" type="text" name="name" />
-      <CustomField label="email" type="email" name="email" />
+      <CustomField label="name" type="text" name="name" required />
+      <CustomField label="email" type="email" name="email" required />
       <FieldArray
         name="phones"
         render={helper => (
@@ -52,6 +52,7 @@ const PersonalForm: FC<Prop> = ({ values, children }) => {
                     label={`phone ${i + 1}`}
                     type="tel"
                     name={`phones.${i}`}
+                    required
                   />
                   {i !== 0 && (
                     <IconButton
